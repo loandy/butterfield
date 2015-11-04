@@ -176,7 +176,11 @@ class Bot(object):
                 'channel': channel['id'],
                 'text': text}
         content = json.dumps(data)
-        yield from self.ws.send(content)
+        try:
+            yield from self.ws.send(content)
+        except Exception as e:
+            logger.error('Could not send content due to exception: {}'\
+                .format(e.message))
 
     @asyncio.coroutine
     def dm(self, user_name_or_id, text):
