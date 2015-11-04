@@ -4,6 +4,7 @@ import importlib
 import itertools
 import json
 import os
+import logging
 from collections import defaultdict
 
 import websockets
@@ -11,8 +12,9 @@ from slacker import Slacker
 from .handlers import environment
 from .utils import load_plugin
 
-__all__ = ['Bot', 'Runner', 'EVENTS', 'ALL', 'run']
+logger = logging.getLogger('butterfield')
 
+__all__ = ['Bot', 'Runner', 'EVENTS', 'ALL', 'run']
 
 ALL = '*'
 
@@ -113,8 +115,13 @@ class Bot(object):
     @asyncio.coroutine
     def ws_handler(self, url, handler):
 
-        self.ws = yield from websockets.connect(url)
         self.running = True
+
+        try:
+            self.ws = yield from websockets.connect(url)
+        except Exception as e:
+            logger.error('Bot failed due to exception: {}'.format(e.message))
+            self.running = False
 
         while True:
             content = yield from self.ws.recv()
