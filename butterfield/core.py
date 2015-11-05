@@ -74,7 +74,7 @@ class Bot(object):
 
         self.slack = Slacker(token)
         self.uuid = hashlib.sha1(token.encode("utf-8")).hexdigest()
-
+        self.ws = None
         self.handlers = defaultdict(list)
         self.daemons = daemons or []
         self.environment = None
@@ -115,13 +115,11 @@ class Bot(object):
     @asyncio.coroutine
     def ws_handler(self, url, handler):
 
-        self.running = True
-
         try:
             self.ws = yield from websockets.connect(url)
+            self.running = True
         except Exception as e:
             logger.error('Bot failed due to exception: {}'.format(e.message))
-            self.running = False
 
         while True:
             content = yield from self.ws.recv()
