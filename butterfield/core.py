@@ -178,7 +178,7 @@ class Bot(object):
             yield from self.ws.send(content)
         except Exception as e:
             logger.error('Could not send content due to exception: {}'\
-                .format(e.message))
+                .format(str(e)))
 
     @asyncio.coroutine
     def dm(self, user_name_or_id, text):
